@@ -23,7 +23,9 @@
   command: pamac install apparmor --no-confirm
   become: yes
   register: apparmor
-  notify: Enable apparmor service
+  notify: 
+    - Enable apparmor service
+    - Start apparmor service
   tags:
     - base
 

@@ -118,6 +118,13 @@
 
 - name: Enable apparmor service
   ansible.builtin.systemd_service:
+    state: enabled
+    name: apparmor
+  become: yes
+  when: apparmor is success
+
+- name: Start apparmor service
+  ansible.builtin.systemd_service:
     state: started
     name: apparmor
   become: yes
