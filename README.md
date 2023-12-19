@@ -4,8 +4,10 @@ Setup a minimal environment for your favorite linux distro using Ansible.
 
 _Supported Distros_:
 
-<img src="./manjaro-icon.png" width="30" height="30"/>
-<img src="./debian-icon.png" width="30" height="30"/>
+<p float="left">
+    <img src="images/manjaro-icon.png" width="30" height="30"/>
+    <img src="images/debian-icon.png" width="30" height="30"/>
+</p>
 
 Dependencies: 
 
