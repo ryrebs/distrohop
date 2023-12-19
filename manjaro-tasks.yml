@@ -219,3 +219,10 @@
   tags:
     - base
     - browser
+
+- name: Install java
+  command: "pamac install jdk-openjdk --no-confirm"
+  become: yes
+  tags:
+    - base
+    - java

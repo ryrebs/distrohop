@@ -25,7 +25,7 @@ Getting started:
 
 3. Run the playbook:
 
-    `pipenv run python -m ansible playbook ./playbook.yml -K <options..>`
+    `pipenv run runplaybook [ansible-options]`
 
 Simple setup:
 
@@ -49,4 +49,5 @@ Base packages:
 - git
 - nvm
 - golang
-- browerser: [firefox, chromium]
+- browsers: [firefox, chromium]
+- jdk-openjdk 
