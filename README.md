@@ -29,7 +29,7 @@ Getting started:
 
 Base packages:
 
-- apparmors
+- apparmor
 - firejail
 - clamav
 - tlps
