@@ -1,0 +1,90 @@
+---
+- name: apt update
+  ansible.builtin.apt:
+    update_cache: yes
+
+- name: apt upgrade
+  become: yes
+  ansible.builtin.apt:
+    upgrade: full
+  tags:
+    - base
+
+- name: Install base packages (Packages without further setup needs.)
+  become: yes
+  ansible.builtin.apt:
+    pkg:
+      - firejail
+      - clamav
+      - terminator
+      - vim
+      - git
+      - gammastep
+      - firefox-esr
+      - chromium
+      - default-jdk
+      - zsh
+      - zplug
+  tags:
+    - base
+
+- name: Install tlp for battery management
+  ansible.builtin.apt:
+    name: tlp
+    state: present
+  register: tlp
+  become: yes
+  notify:
+    - Setup tlp config
+  tags:
+    - base
+    - tlp
+
+- name: Create nvm folder
+  ansible.builtin.file:
+    path: "{{ nvm_path }}"
+    state: directory
+    mode: "0755"
+  register: nvm_folder
+  tags:
+    - dev
+    - nvm
+
+- name: Install nvm
+  shell: >
+    export NVM_DIR={{ nvm_path }} && curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/{{ nvm_version }}/install.sh | bash
+  args:
+    creates: "{{ nvm_path }}/nvm.sh"
+  register: nvm
+  when: nvm_folder is success
+  tags:
+    - dev
+    - nvm
+
+- name: Install latest node
+  shell: ". {{ nvm_path }}/nvm.sh && nvm install node"
+  args:
+    creates: "{{ nvm_path }}/.nvm/versions/node"
+    chdir: "{{ nvm_path }}"
+    executable: /bin/zsh
+  when: nvm is success
+  tags:
+    - dev
+    - node
+
+  ## TODO: install and setup: golan, docker
+
+- name: Remove useless packages from the cache
+  become: yes
+  ansible.builtin.apt:
+    autoclean: yes
+  tags:
+    - base
+
+- name: Remove dependencies that are no longer required and purge their configuration files
+  become: yes
+  ansible.builtin.apt:
+    autoremove: yes
+    purge: true
+  tags:
+    - base

@@ -1,26 +1,17 @@
 ---
-- hosts: localhost
+- hosts: "{{ target | default('localhost', true) }}"
   vars_files:
     - ./common-vars.yml
 
   tasks:
     - name: Install and setup environment for Manjaro
-      import_tasks: manjaro-tasks.yml
+      include_role:
+        name: archlinux
       when: ansible_distribution == 'Archlinux'
+      tags: always
 
-    # TODO 
-    # - name: Install and setup environment for Debian
-    #   import_tasks: debian-tasks.yml
-    #   when: ansible_distribution == 'Debian'
-  
-  handlers:
-    - name: Handlers for Manjaro
-      import_tasks: manjaro-handlers.yml
-      when: ansible_distribution == 'Archlinux'
-
-    # TODO 
-    # - name: Handlers for Debian
-    #   import_tasks: debian-handlers.yml
-    #   when: ansible_distribution == 'Debian'
-
-  
+    - name: Install and setup environment for Debian
+      include_role:
+        name: debian
+      when: ansible_distribution == 'Debian'
+      tags: always

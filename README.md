@@ -27,21 +27,15 @@ Getting started:
 
     `pipenv run runplaybook [ansible-options]`
 
-Simple setup:
-
-    <distro-name>-task.yml - Task related files
-    <distro-name>-handlers.yml - Handlers
-    common-vars.yml - Variables common to all distros
-
 Base packages:
 
-- apparmor
+- apparmors
 - firejail
 - clamav
-- tlp
+- tlps
 - docker
 - docker compose
-- redshift
+- redshift / gammastep
 - yay
 - terminator
 - vim
