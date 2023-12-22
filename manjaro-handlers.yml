@@ -4,23 +4,17 @@
   become: yes
   when: zsh is success
 
-- name: Add nvm to path
-  lineinfile:
+- name: Setup nvm
+  blockinfile:
     path: "{{ ansible_env.HOME }}/.zshrc"
     state: present
-    line: export NVM_DIR="{{ ansible_env.HOME }}/.nvm"
-
-- name: Load nvm
-  lineinfile:
-    path: "{{ ansible_env.HOME }}/.zshrc"
-    state: present
-    line: '[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"'
-
-- name: Load bash completion
-  lineinfile:
-    path: "{{ ansible_env.HOME }}/.zshrc"
-    state: present
-    line: '[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"'
+    marker: "# {mark} ANSIBLE MANAGED BLOCK nvm"
+    block: |
+      NVM_DIR="{{ ansible_env.HOME }}/.nvm"
+      export PATH=$PATH:NVM_DIR
+      [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+      [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+  when: nvm is success
 
 - name: Set zsh theme
   lineinfile:
@@ -43,10 +37,12 @@
     - github_email != None
 
 - name: Create git log alias
-  lineinfile:
+  blockinfile:
     path: "{{ ansible_env.HOME }}/.zshrc"
     state: present
-    line: 'alias glog="git log --graph --all --pretty=format:''%C(blue)%h %C(red)%d %Creset - %C(yellow)%s%Creset %C(green)(%cr)%Creset <%aN>''"'
+    marker: "# {mark} ANSIBLE MANAGED BLOCK Git Aliases"
+    block: |
+      'alias glog="git log --graph --all --pretty=format:''%C(blue)%h %C(red)%d %Creset - %C(yellow)%s%Creset %C(green)(%cr)%Creset <%aN>''"'
 
 - name: Generate rsa keys
   command: ssh-keygen -t ed25519 -C '{{ github_email }}' -f "{{ ansible_env.HOME }}/.ssh/id_rsa"
@@ -61,6 +57,7 @@
     state: directory
     mode: "0755"
   listen: Golang post installation setup
+  when: golang is success
 
 - name: Create golang package folder
   ansible.builtin.file:
@@ -68,40 +65,29 @@
     state: directory
     mode: "0755"
   listen: Golang post installation setup
+  when: golang is success
 
 - name: Extract golang
   unarchive:
     src: "{{ ansible_env.HOME }}/Downloads/golang.tar.gz"
     dest: "{{ golang_root_path }}"
   listen: Golang post installation setup
+  when: golang is success
 
-- name: Add go root bin to path
-  lineinfile:
+- name: Export golang paths
+  blockinfile:
     path: "{{ ansible_env.HOME }}/.zshrc"
     state: present
-    line: "export PATH=$PATH:{{ golang_root_path }}/bin"
-  listen: Golang post installation setup
-
-- name: Export golang GOPATH
-  lineinfile:
-    path: "{{ ansible_env.HOME }}/.zshrc"
-    state: present
-    line: "export GOPATH={{ golang_app_path }}"
-  listen: Golang post installation setup
-
-- name: Export golang GOBIN
-  lineinfile:
-    path: "{{ ansible_env.HOME }}/.zshrc"
-    state: present
-    line: "export GOBIN={{ golang_app_path }}/bin"
-  listen: Golang post installation setup
-
-- name: Add GOBIN to PATH
-  lineinfile:
-    path: "{{ ansible_env.HOME }}/.zshrc"
-    state: present
-    line: "export PATH=$PATH:$GOBIN"
-  listen: Golang post installation setup
+    marker: "# {mark} ANSIBLE MANAGED BLOCK Golang"
+    block: |
+      # Golang
+      GOPATH={{ golang_app_path }}
+      GOBIN={{ golang_app_path }}/bin
+      export PATH=$PATH:$GOBIN
+      export PATH=$PATH:$GOPATH
+      export PATH=$PATH:{{ golang_root_path }}/go/bin
+  listen: Golang setup paths
+  when: golang is success
 
 - name: Remove golang tgz
   file:

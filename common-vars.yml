@@ -4,6 +4,7 @@ github_user:
 github_email:
 golang_version:
 nvm_version:
+nvm_path:
 android_home_path:
 golang_root_path:
 golang_app_path:

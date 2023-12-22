@@ -23,7 +23,7 @@
   command: pamac install apparmor --no-confirm
   become: yes
   register: apparmor
-  notify: 
+  notify:
     - Enable apparmor service
     - Start apparmor service
   tags:
@@ -40,7 +40,7 @@
   command: pamac install tlp --no-confirm
   register: tlp
   become: yes
-  notify: 
+  notify:
     - Setup tlp config
   tags:
     - base
@@ -134,25 +134,34 @@
     - dev
     - docker
 
-- name: Install nvm
-  shell: >
-    curl -o- "https://raw.githubusercontent.com/nvm-sh/nvm/{{ nvm_version }}/install.sh" | bash
-  args:
-    creates: "{{ ansible_env.HOME }}/.nvm/nvm.sh"
-  notify:
-    - Add nvm to path
-    - Load nvm
-    - Load bash completion
+- name: Create nvm folder
+  ansible.builtin.file:
+    path: "{{ nvm_path }}"
+    state: directory
+    mode: "0755"
+  register: nvm_folder
   tags:
     - dev
-    - node
+    - nvm
+
+- name: Install nvm
+  shell: >
+    export NVM_DIR={{ nvm_path }} && curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/{{ nvm_version }}/install.sh | bash
+  args:
+    creates: "{{ nvm_path }}/nvm.sh"
+  register: nvm
+  when: nvm_folder is success
+  tags:
+    - dev
+    - nvm
 
 - name: Install latest node
-  shell: ". {{ ansible_env.HOME }}/.nvm/nvm.sh && nvm install node"
+  shell: ". {{ nvm_path }}/nvm.sh && nvm install node"
   args:
-    creates: "{{ ansible_env.HOME }}/.nvm/versions/node"
-    chdir: "{{ ansible_env.HOME }}"
+    creates: "{{ nvm_path }}/.nvm/versions/node"
+    chdir: "{{ nvm_path }}"
     executable: /bin/zsh
+  when: nvm is success
   tags:
     - dev
     - node
@@ -161,7 +170,10 @@
   get_url:
     url: "https://dl.google.com/go/{{ golang_version }}.linux-amd64.tar.gz"
     dest: "{{ ansible_env.HOME }}/Downloads/golang.tar.gz"
-  notify: Golang post installation setup
+  notify:
+    - Golang post installation setup
+    - Export golang paths
+  register: golang
   tags:
     - dev
     - golang
@@ -170,7 +182,7 @@
   blockinfile:
     path: "{{ ansible_env.HOME }}/.zshrc"
     state: present
-    backup: yes
+    marker: "# {mark} ANSIBLE MANAGED BLOCK Defaults"
     block: |
       # Android
       ANDROID_HOME={{ android_home_path }}
@@ -192,12 +204,10 @@
 
       # Firejail
       alias fjail='firejail --apparmor --private={{ jailtime_path }}'
-
   tags:
     - dev
     - misc
     - zshrc
-
 
 - name: Load/unload kernel modules
   become: yes
@@ -226,3 +236,10 @@
   tags:
     - base
     - java
+
+- name: Enable firewall
+  command: "ufw enable"
+  become: yes
+  tags:
+    - base
+    - firewall
