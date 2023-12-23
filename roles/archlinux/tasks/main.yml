@@ -204,6 +204,9 @@
 
       # Firejail
       alias fjail='firejail --apparmor --private={{ jailtime_path }}'
+
+      alias ec="vim $HOME/.zshrc" # edit .zshrc
+      alias sc="source $HOME/.zshrc"  # reload zsh configuration
   tags:
     - dev
     - misc
