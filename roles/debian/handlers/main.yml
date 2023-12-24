@@ -136,3 +136,11 @@
       export PATH=$PATH:{{ golang_root_dir_path }}/go/bin
   listen: Golang setup paths
   when: golang is success
+
+
+- name: Setup codium
+  ansible.builtin.command: dpkg -i ./codium_{{ codium_version }}_amd64.deb
+  args:
+    chdir: "{{ ansible_env.HOME }}/Downloads"
+  become: yes
+  when: codium is success

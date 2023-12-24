@@ -185,9 +185,8 @@
 
 - name: Install zsh
   ansible.builtin.apt:
-    pkg:
-      - zsh
-      - zplug
+    name: zsh
+    state: present
   register: zsh
   become: yes
   notify: Change shell to zsh
@@ -209,3 +208,13 @@
     purge: true
   tags:
     - cleanup
+
+- name: Install VScodium
+  ansible.builtin.get_url:
+    url: "https://github.com/VSCodium/vscodium/releases/download/{{ codium_version }}/codium_{{ codium_version }}_amd64.deb"
+    dest: "{{ ansible_env.HOME }}/Downloads"
+  notify: Setup codium
+  register: codium
+  tags:
+    - dev
+    - codium
