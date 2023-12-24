@@ -21,7 +21,7 @@
   ansible.builtin.unarchive:
     src: "{{ arch_zplug_dir_path }}/zplug.zip"
     dest: "{{ arch_zplug_dir_path }}"
-    remote_src: "{{ remote | default('no', true) }}"
+    remote_src: "{{ remote | default(false) }}"
 
 - name: Remove existing .oh-my-zsh
   listen: Setup zplug

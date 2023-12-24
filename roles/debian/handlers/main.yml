@@ -141,7 +141,7 @@
   unarchive:
     src: "{{ ansible_env.HOME }}/Downloads/golang.tar.gz"
     dest: "{{ golang_root_dir_path }}"
-    remote_src: "{{ remote | default('no', true) }}"
+    remote_src: "{{ remote | default(false) }}"
   listen: Golang post installation setup
   when: golang is succeeded
 
