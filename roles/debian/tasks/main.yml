@@ -16,7 +16,6 @@
     pkg:
       - firejail
       - clamav
-      - vim
       - gammastep
       - firefox-esr
       - default-jdk
@@ -76,6 +75,7 @@
       - chromium
       - default-jdk
       - zplug
+      - vim
   tags:
     - dev
 
