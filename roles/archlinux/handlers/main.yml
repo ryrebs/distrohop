@@ -19,14 +19,14 @@
 - name: Extract folder
   listen: Setup zplug
   ansible.builtin.unarchive:
-    src: "{{ zplug_path }}/zplug.zip"
-    dest: "{{ zplug_path }}"
+    src: "{{ arch_zplug_dir_path }}/zplug.zip"
+    dest: "{{ arch_zplug_dir_path }}"
     remote_src: "{{ remote | default('no', true) }}"
 
 - name: Remove existing .oh-my-zsh
   listen: Setup zplug
   file:
-    path: "{{ zplug_path }}/zplug.zip"
+    path: "{{ arch_zplug_dir_path }}/zplug.zip"
     state: absent
 
 - name: Add plugins to zshrc
@@ -43,7 +43,7 @@
       HISTFILE=~/.zsh_history
 
       # zplug - manage plugins
-      source {{ zplug_path }}/zplug-master/init.zsh
+      source {{ arch_zplug_dir_path }}/zplug-master/init.zsh
       zplug "plugins/git", from:oh-my-zsh
       zplug "plugins/sudo", from:oh-my-zsh
       zplug "plugins/command-not-found", from:oh-my-zsh
@@ -93,7 +93,7 @@
 
 - name: Create golang root extraction folder
   ansible.builtin.file:
-    path: "{{ golang_root_path }}"
+    path: "{{ golang_root_dir_path }}"
     state: directory
     mode: "0755"
   listen: Golang post installation setup
@@ -101,7 +101,7 @@
 
 - name: Create golang package folder
   ansible.builtin.file:
-    path: "{{ golang_app_path }}"
+    path: "{{ golang_app_dir_path }}"
     state: directory
     mode: "0755"
   listen: Golang post installation setup
@@ -110,7 +110,7 @@
 - name: Extract golang
   unarchive:
     src: "{{ ansible_env.HOME }}/Downloads/golang.tar.gz"
-    dest: "{{ golang_root_path }}"
+    dest: "{{ golang_root_dir_path }}"
   listen: Golang post installation setup
   when: golang is success
 
@@ -121,11 +121,11 @@
     marker: "# {mark} ANSIBLE MANAGED BLOCK Golang"
     block: |
       # Golang
-      GOPATH={{ golang_app_path }}
-      GOBIN={{ golang_app_path }}/bin
+      GOPATH={{ golang_app_dir_path }}
+      GOBIN={{ golang_app_dir_path }}/bin
       export PATH=$PATH:$GOBIN
       export PATH=$PATH:$GOPATH
-      export PATH=$PATH:{{ golang_root_path }}/go/bin
+      export PATH=$PATH:{{ golang_root_dir_path }}/go/bin
   listen: Golang setup paths
   when: golang is success
 
@@ -159,8 +159,9 @@
 - name: Setup tlp config
   become: yes
   copy:
-    dest: "{{ tlp_config_path }}"
+    dest: "{{ tlp_conf_file_path }}"
     content: |
+
       ## -- Start custom config
       ## Mostly firmware related. Check docs for more info
 
