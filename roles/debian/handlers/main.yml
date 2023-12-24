@@ -72,3 +72,57 @@
           fi
       fi
       zplug load --verbose
+
+- name: Setup ufw
+  become: yes
+  command: "{{ item }}"
+  loop:
+    - ufw default deny incoming
+    - ufw default allow outgoing
+    - ufw enable
+  when: ufw is success
+
+- name: Create golang root extraction folder
+  ansible.builtin.file:
+    path: "{{ golang_root_path }}"
+    state: directory
+    mode: "0755"
+  listen: Golang post installation setup
+  when: golang is success
+
+- name: Create golang package folder
+  ansible.builtin.file:
+    path: "{{ golang_app_path }}"
+    state: directory
+    mode: "0755"
+  listen: Golang post installation setup
+  when: golang is success
+
+- name: Extract golang
+  unarchive:
+    src: "{{ ansible_env.HOME }}/Downloads/golang.tar.gz"
+    dest: "{{ golang_root_path }}"
+    remote_src: "{{ remote | default('no', true) }}"
+  listen: Golang post installation setup
+  when: golang is success
+
+- name: Remove golang tgz
+  file:
+    path: "{{ ansible_env.HOME }}/Downloads/golang.tar.gz"
+    state: absent
+  listen: Golang post installation setup
+
+- name: Export golang paths
+  blockinfile:
+    path: "{{ ansible_env.HOME }}/.zshrc"
+    state: present
+    marker: "# {mark} ANSIBLE MANAGED BLOCK Golang"
+    block: |
+      # Golang
+      GOPATH={{ golang_app_path }}
+      GOBIN={{ golang_app_path }}/bin
+      export PATH=$PATH:$GOBIN
+      export PATH=$PATH:$GOPATH
+      export PATH=$PATH:{{ golang_root_path }}/go/bin
+  listen: Golang setup paths
+  when: golang is success

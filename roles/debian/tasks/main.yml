@@ -16,16 +16,68 @@
     pkg:
       - firejail
       - clamav
-      - terminator
       - vim
-      - git
       - gammastep
       - firefox-esr
+      - default-jdk
+      - apparmor-profiles-extra
+      - apparmor-profiles
+  tags:
+    - base
+
+- name: Install tlp for battery management
+  ansible.builtin.apt:
+    name: tlp
+    state: present
+  register: tlp
+  become: yes
+  notify:
+    - Setup tlp config
+  tags:
+    - base
+    - tlp
+
+## (*Note for managed node ) This will enable the firewall and cut off ssh connection.
+- name: Install firewall
+  ansible.builtin.apt:
+    name: ufw
+    state: present
+  register: ufw
+  become: yes
+  notify:
+    - Setup ufw
+  tags:
+    - base
+    - firewall
+
+- name: Remove useless packages from the cache
+  become: yes
+  ansible.builtin.apt:
+    autoclean: yes
+  tags:
+    - base
+    - cleanup
+
+- name: Remove dependencies that are no longer required and purge their configuration files
+  become: yes
+  ansible.builtin.apt:
+    autoremove: yes
+    purge: true
+  tags:
+    - base
+    - cleanup
+
+- name: Install some packages for development
+  become: yes
+  ansible.builtin.apt:
+    pkg:
+      - terminator
+      - git
       - chromium
       - default-jdk
       - zplug
   tags:
-    - base
+    - dev
 
 - name: Install zsh
   ansible.builtin.apt:
@@ -37,7 +89,6 @@
   notify: Change shell to zsh
   tags:
     - dev
-    - shell
     - zsh
 
 - name: Remove existing .oh-my-zsh
@@ -56,20 +107,7 @@
   notify: Setup zshrc
   tags:
     - dev
-    - shell
     - zshrc
-
-- name: Install tlp for battery management
-  ansible.builtin.apt:
-    name: tlp
-    state: present
-  register: tlp
-  become: yes
-  notify:
-    - Setup tlp config
-  tags:
-    - base
-    - tlp
 
 - name: Create nvm folder
   ansible.builtin.file:
@@ -103,22 +141,6 @@
     - dev
     - node
 
-- name: Remove useless packages from the cache
-  become: yes
-  ansible.builtin.apt:
-    autoclean: yes
-  tags:
-    - base
-
-- name: Remove dependencies that are no longer required and purge their configuration files
-  become: yes
-  ansible.builtin.apt:
-    autoremove: yes
-    purge: true
-  tags:
-    - base
-
-
 - name: Insert MISC shell lines
   blockinfile:
     path: "{{ ansible_env.HOME }}/.zshrc"
@@ -150,8 +172,16 @@
       alias sc="source $HOME/.zshrc"  # reload zsh configuration
   tags:
     - dev
-    - misc
     - zshrc
 
-## TODO: Install: golang, docker
-## SETUP: Firewall
+- name: Install Golang
+  get_url:
+    url: "https://dl.google.com/go/{{ golang_version }}.linux-amd64.tar.gz"
+    dest: "{{ ansible_env.HOME }}/Downloads/golang.tar.gz"
+  notify:
+    - Golang post installation setup
+    - Export golang paths
+  register: golang
+  tags:
+    - dev
+    - golang
