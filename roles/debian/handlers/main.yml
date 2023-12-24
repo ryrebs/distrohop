@@ -96,14 +96,30 @@
       fi
       zplug load --verbose
 
-- name: Setup ufw
-  become: yes
-  command: "{{ item }}"
+- name: Set firewall rules
+  command: "{{ item  }}"
   loop:
     - ufw default deny incoming
     - ufw default allow outgoing
-    - ufw enable
+  become: yes
+  listen: Setup ufw
+
+- name: Allow ssh
+  ansible.builtin.command: ufw allow SSH
+  become: yes
+  when:
+    - ufw is succeeded
+    - remote is defined and "remote | bool"
+  listen: Setup ufw
+
+## (*Note for managed node ) This will enable the firewall and might cut off ssh connection.
+- name: Enable firewall
+  ansible.builtin.command: ufw enable
+  become: yes
   when: ufw is succeeded
+  listen: Setup ufw
+  async: 1
+  poll: 0
 
 - name: Create golang root extraction folder
   ansible.builtin.file:

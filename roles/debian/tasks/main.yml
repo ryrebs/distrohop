@@ -35,15 +35,13 @@
     - base
     - tlp
 
-## (*Note for managed node ) This will enable the firewall and cut off ssh connection.
 - name: Install firewall
   ansible.builtin.apt:
     name: ufw
     state: present
   register: ufw
   become: yes
-  notify:
-    - Setup ufw
+  notify: Setup ufw
   tags:
     - base
     - firewall

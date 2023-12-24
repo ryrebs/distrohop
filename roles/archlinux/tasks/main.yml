@@ -69,21 +69,13 @@
   become: yes
   tags: base
 
-- name: Install code
-  command: pamac install code --no-confirm
-  become: yes
-  tags:
-    - dev
-    - code
-
 - name: Install terminator
   command: pamac install terminator --no-confirm
   register: terminator
   become: yes
-  tags: 
+  tags:
     - dev
     - terminator
-
 
 - name: Install vim
   command: pamac install vim --no-confirm
@@ -247,17 +239,33 @@
     - base
     - java
 
-## (*Note for managed node ) This will enable the firewall and cut off ssh connection.
-- name: Enable firewall
+- name: Set firewall rules
   command: "{{ item  }}"
   loop:
     - ufw default deny incoming
     - ufw default allow outgoing
-    - ufw enable
   become: yes
   tags:
     - base
     - firewall
+
+- name: Allow ssh
+  command: ufw allow ssh
+  become: yes
+  when: remote is defined and "remote | bool"
+  tags:
+    - base
+    - firewall
+
+## (*Note for managed node ) This will enable the firewall and might cut off ssh connection.
+- name: Enable firewall
+  ansible.builtin.command: ufw enable
+  become: yes
+  tags:
+    - base
+    - firewall
+  async: 1
+  poll: 0
 
 - name: Install Zplug
   ansible.builtin.get_url:
@@ -268,3 +276,6 @@
   tags:
     - dev
     - zplug
+#
+# TODO: Install codium a VSCode without Microsoft replacement
+#
