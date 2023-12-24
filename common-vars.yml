@@ -6,6 +6,7 @@ golang_version:
 nvm_version:
 nvm_path:
 android_home_path:
+zplug_path:
 golang_root_path:
 golang_app_path:
 jailtime_path:
