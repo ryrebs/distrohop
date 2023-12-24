@@ -16,12 +16,52 @@
       [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
   when: nvm is success
 
-- name: Set zsh theme
-  lineinfile:
+- name: Extract folder
+  listen: Setup zplug
+  ansible.builtin.unarchive:
+    src: "{{ zplug_path }}/zplug.zip"
+    dest: "{{ zplug_path }}"
+    remote_src: "{{ remote | default('no', true) }}"
+
+- name: Remove existing .oh-my-zsh
+  listen: Setup zplug
+  file:
+    path: "{{ zplug_path }}/zplug.zip"
+    state: absent
+
+- name: Add plugins to zshrc
+  listen: Setup zplug
+  blockinfile:
     path: "{{ ansible_env.HOME }}/.zshrc"
     state: present
-    regexp: "^ZSH_THEME=.*"
-    line: 'ZSH_THEME="ys"'
+    marker: "# {mark} ANSIBLE MANAGED BLOCK zplug"
+    block: |
+
+      # Keep 5000 lines of history within the shell and save it to ~/.zsh_history:
+      HISTSIZE=5000
+      SAVEHIST=5000
+      HISTFILE=~/.zsh_history
+
+      # zplug - manage plugins
+      source {{ zplug_path }}/zplug-master/init.zsh
+      zplug "plugins/git", from:oh-my-zsh
+      zplug "plugins/sudo", from:oh-my-zsh
+      zplug "plugins/command-not-found", from:oh-my-zsh
+      zplug "zsh-users/zsh-syntax-highlighting"
+      zplug "zsh-users/zsh-autosuggestions"
+      zplug "zsh-users/zsh-history-substring-search"
+      zplug "zsh-users/zsh-completions"
+      zplug "junegunn/fzf"
+      zplug "themes/ys", from:oh-my-zsh, as:theme   # Theme
+
+      # zplug - install/load new plugins when zsh is started or reloaded
+      if ! zplug check --verbose; then
+          printf "Install? [y/N]: "
+          if read -q; then
+              echo; zplug install
+          fi
+      fi
+      zplug load --verbose
 
 - name: Setup git configurations
   command: "git config --global {{ item }}"
@@ -116,7 +156,6 @@
   become: yes
   when: apparmor is success
 
-
 - name: Setup tlp config
   become: yes
   copy:
@@ -150,6 +189,6 @@
 
       # Enable turbo boost
       CPU_BOOST_ON_AC=1
-      
-      ## -- Start custom config
+
+      ## -- End custom config
   when: tlp is success

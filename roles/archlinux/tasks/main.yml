@@ -49,7 +49,7 @@
   command: pamac install docker-compose --no-confirm
   become: yes
   tags:
-    - base
+    - dev
 
 - name: Install firejail
   command: pamac install firejail --no-confirm
@@ -74,20 +74,23 @@
   become: yes
   tags:
     - dev
-    - long
+    - code
 
 - name: Install terminator
   command: pamac install terminator --no-confirm
   register: terminator
   become: yes
-  tags: dev
+  tags: 
+    - dev
+    - terminator
+
 
 - name: Install vim
   command: pamac install vim --no-confirm
   become: yes
   tags:
     - dev
-    - shell
+    - vim
 
 - name: Install zsh
   command: pamac install zsh zsh-completions --no-confirm
@@ -97,23 +100,24 @@
     - Change shell to zsh
   tags:
     - dev
-    - shell
+    - zsh
 
 - name: Remove existing .oh-my-zsh
   file:
     path: "{{ ansible_env.HOME }}/.oh-my-zsh"
     state: absent
+  tags:
+    - dev
+    - zshrc
 
 - name: Install oh-my-zsh
   shell: >
     curl -o- "https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh" | bash
   args:
     chdir: "{{ ansible_env.HOME }}"
-  notify:
-    - Set zsh theme
   tags:
     - dev
-    - shell
+    - zshrc
 
 - name: Install git
   command: pamac install git --no-confirm
@@ -167,7 +171,7 @@
     - node
 
 - name: Install Golang
-  get_url:
+  ansible.builtin.get_url:
     url: "https://dl.google.com/go/{{ golang_version }}.linux-amd64.tar.gz"
     dest: "{{ ansible_env.HOME }}/Downloads/golang.tar.gz"
   notify:
@@ -209,7 +213,6 @@
       alias sc="source $HOME/.zshrc"  # reload zsh configuration
   tags:
     - dev
-    - misc
     - zshrc
 
 - name: Load/unload kernel modules
@@ -223,15 +226,19 @@
     - base
     - module
 
-- name: Install browsers
-  command: "pamac install {{ item }} --no-confirm"
-  loop:
-    - firefox
-    - chromium
+- name: Install firefox
+  command: "pamac install firefox --no-confirm"
   become: yes
   tags:
     - base
-    - browser
+    - firefox
+
+- name: Install firefox
+  command: "pamac install chromium --no-confirm"
+  become: yes
+  tags:
+    - base
+    - chromium
 
 - name: Install java
   command: "pamac install jdk-openjdk --no-confirm"
@@ -240,9 +247,24 @@
     - base
     - java
 
+## (*Note for managed node ) This will enable the firewall and cut off ssh connection.
 - name: Enable firewall
-  command: "ufw enable"
+  command: "{{ item  }}"
+  loop:
+    - ufw default deny incoming
+    - ufw default allow outgoing
+    - ufw enable
   become: yes
   tags:
     - base
     - firewall
+
+- name: Install Zplug
+  ansible.builtin.get_url:
+    url: https://github.com/zplug/zplug/archive/refs/heads/master.zip
+    dest: "{{ zplug_path }}/zplug.zip"
+  notify: Setup zplug
+  register: zplug
+  tags:
+    - dev
+    - zplug
