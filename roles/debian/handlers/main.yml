@@ -33,7 +33,7 @@
       # Enable turbo boost
       CPU_BOOST_ON_AC=1
 
-      ## -- Start custom config
+      ## -- End custom config
   when: tlp is success
 
 - name: Change shell to zsh

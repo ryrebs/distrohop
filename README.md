@@ -23,25 +23,36 @@ Getting started:
 
     `pipenv install` (On project root)
 
+3. Update `common-vars.yml`
+
 3. Run the playbook:
 
     `pipenv run runplaybook [ansible-options]`
+
+Tags: base, dev
 
 Base packages:
 
 - apparmor
 - firejail
+- ufw
 - clamav
 - tlps
-- docker
-- docker compose
 - redshift / gammastep
 - yay
+- firefox
+- jdk-openjdk 
+
+Dev packages:
+
 - terminator
-- vim
-- zsh
 - git
+- vim
+- chromium
+- default-jdk
+- zplug
+- zsh
 - nvm
 - golang
-- browsers: [firefox, chromium]
-- jdk-openjdk 
+- docker
+- docker compose
