@@ -56,7 +56,6 @@
       - git
       - chromium
       - default-jdk
-      - zplug
       - vim
   tags:
     - dev
@@ -65,16 +64,6 @@
   file:
     path: "{{ ansible_env.HOME }}/.oh-my-zsh"
     state: absent
-  tags:
-    - dev
-    - zshrc
-
-- name: Install oh-my-zsh
-  shell: >
-    curl -o- "https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh" | bash
-  args:
-    chdir: "{{ ansible_env.HOME }}"
-  notify: Setup zshrc
   tags:
     - dev
     - zshrc
@@ -95,17 +84,6 @@
     - dev
     - git
 
-- name: Create git log alias
-  blockinfile:
-    path: "{{ ansible_env.HOME }}/.zshrc"
-    state: present
-    marker: "# {mark} ANSIBLE MANAGED BLOCK Git Aliases"
-    block: |
-      'alias glog="git log --graph --all --pretty=format:''%C(blue)%h %C(red)%d %Creset - %C(yellow)%s%Creset %C(green)(%cr)%Creset <%aN>''"'
-  tags:
-    - dev
-    - git
-
 - name: Create nvm folder
   ansible.builtin.file:
     path: "{{ nvm_dir_path }}"
@@ -117,8 +95,8 @@
     - nvm
 
 - name: Install nvm
-  shell: >
-    export NVM_DIR={{ nvm_dir_path }} && curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/{{ nvm_version }}/install.sh | bash
+  ansible.builtin.shell: >
+    export PROFILE=/dev/null NVM_DIR={{ nvm_dir_path }} && curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/{{ nvm_version }}/install.sh | bash
   args:
     creates: "{{ nvm_dir_path }}/nvm.sh"
   register: nvm
@@ -128,15 +106,48 @@
     - nvm
 
 - name: Install latest node
-  shell: ". {{ nvm_dir_path }}/nvm.sh && nvm install node"
+  ansible.builtin.command: "/bin/sh {{ nvm_dir_path }}/nvm.sh && nvm install node"
   args:
     creates: "{{ nvm_dir_path }}/.nvm/versions/node"
     chdir: "{{ nvm_dir_path }}"
-    executable: /bin/zsh
   when: nvm is success
   tags:
     - dev
     - node
+
+- name: Install Golang
+  get_url:
+    url: "https://dl.google.com/go/{{ golang_version }}.linux-amd64.tar.gz"
+    dest: "{{ ansible_env.HOME }}/Downloads/golang.tar.gz"
+  notify:
+    - Golang post installation setup
+    - Export golang paths
+  register: golang
+  tags:
+    - dev
+    - golang
+
+- name: Install zsh
+  become: yes
+  ansible.builtin.apt:
+    pkg:
+      - zsh
+      - zplug
+  notify: Change shell to zsh
+  register: zsh_install
+  tags:
+    - dev
+    - zsh
+
+- name: Install oh-my-zsh
+  ansible.builtin.shell: curl -o- "https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh" | bash
+  args:
+    chdir: "{{ ansible_env.HOME }}"
+  notify: Setup zshrc
+  when: zsh_install is succeeded
+  tags:
+    - dev
+    - zshrc
 
 - name: Insert MISC shell lines
   blockinfile:
@@ -171,29 +182,6 @@
     - dev
     - zshrc
 
-- name: Install Golang
-  get_url:
-    url: "https://dl.google.com/go/{{ golang_version }}.linux-amd64.tar.gz"
-    dest: "{{ ansible_env.HOME }}/Downloads/golang.tar.gz"
-  notify:
-    - Golang post installation setup
-    - Export golang paths
-  register: golang
-  tags:
-    - dev
-    - golang
-
-- name: Install zsh
-  ansible.builtin.apt:
-    name: zsh
-    state: present
-  register: zsh
-  become: yes
-  notify: Change shell to zsh
-  tags:
-    - dev
-    - zsh
-
 - name: Remove useless packages from the cache
   become: yes
   ansible.builtin.apt:
@@ -213,7 +201,7 @@
   ansible.builtin.get_url:
     url: "https://github.com/VSCodium/vscodium/releases/download/{{ codium_version }}/codium_{{ codium_version }}_amd64.deb"
     dest: "{{ ansible_env.HOME }}/Downloads"
-  notify: Setup codium
+  notify: Codium post install
   register: codium
   tags:
     - dev

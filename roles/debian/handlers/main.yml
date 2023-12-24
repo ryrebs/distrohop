@@ -34,13 +34,13 @@
       CPU_BOOST_ON_AC=1
 
       ## -- End custom config
-  when: tlp is success
+  when: tlp is succeeded
   listen: Setup tlp
 
 - name: Start tlp
   become: yes
   command: tlp start
-  when: tlp is success
+  when: tlp is succeeded
   listen: Setup tlp
 
 - name: Change shell to zsh
@@ -49,9 +49,22 @@
     name: "{{ remote_user }}"
     shell: /usr/bin/zsh
     state: present
-  when: zsh is success
+  when: zsh_install is succeeded
 
-- name: Setup zshrc
+- name: Create git log alias
+  listen: Setup zshrc
+  blockinfile:
+    path: "{{ ansible_env.HOME }}/.zshrc"
+    state: present
+    marker: "# {mark} ANSIBLE MANAGED BLOCK Git Aliases"
+    block: |
+      'alias glog="git log --graph --all --pretty=format:''%C(blue)%h %C(red)%d %Creset - %C(yellow)%s%Creset %C(green)(%cr)%Creset <%aN>''"'
+  tags:
+    - dev
+    - git
+
+- name: Add zplug default plugins
+  listen: Setup zshrc
   blockinfile:
     path: "{{ ansible_env.HOME }}/.zshrc"
     state: present
@@ -90,7 +103,7 @@
     - ufw default deny incoming
     - ufw default allow outgoing
     - ufw enable
-  when: ufw is success
+  when: ufw is succeeded
 
 - name: Create golang root extraction folder
   ansible.builtin.file:
@@ -98,7 +111,7 @@
     state: directory
     mode: "0755"
   listen: Golang post installation setup
-  when: golang is success
+  when: golang is succeeded
 
 - name: Create golang package folder
   ansible.builtin.file:
@@ -106,7 +119,7 @@
     state: directory
     mode: "0755"
   listen: Golang post installation setup
-  when: golang is success
+  when: golang is succeeded
 
 - name: Extract golang
   unarchive:
@@ -114,7 +127,7 @@
     dest: "{{ golang_root_dir_path }}"
     remote_src: "{{ remote | default('no', true) }}"
   listen: Golang post installation setup
-  when: golang is success
+  when: golang is succeeded
 
 - name: Remove golang tgz
   file:
@@ -135,12 +148,18 @@
       export PATH=$PATH:$GOPATH
       export PATH=$PATH:{{ golang_root_dir_path }}/go/bin
   listen: Golang setup paths
-  when: golang is success
-
+  when: golang is succeeded
 
 - name: Setup codium
   ansible.builtin.command: dpkg -i ./codium_{{ codium_version }}_amd64.deb
   args:
     chdir: "{{ ansible_env.HOME }}/Downloads"
   become: yes
-  when: codium is success
+  when: codium is succeeded
+  listen: Codium post install
+
+- name: Remove codium .deb
+  file:
+    path: "{{ ansible_env.HOME }}/Downloads/codium_{{ codium_version }}_amd64.deb"
+    state: absent
+  listen: Codium post install

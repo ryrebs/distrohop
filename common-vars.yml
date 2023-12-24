@@ -12,3 +12,4 @@ golang_app_dir_path: <abs-path-to-folder>/golang/packages
 jailtime_dir_path: <abs-path-to-folder>/jailtime
 tlp_conf_file_path: <abs-path-to-folder-tlp.d>/<x>-<yourcustomconfig>.conf
 arch_kernel_module_conf_file_path: <abs-path-to-folder-modprobe.d>/<yourcustomconfig>.conf
+codium_version: <x.x.x>
