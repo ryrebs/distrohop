@@ -56,3 +56,5 @@ Dev packages:
 - golang
 - docker
 - docker compose
+- codium
+- virtualbox

@@ -206,3 +206,13 @@
   tags:
     - dev
     - codium
+
+- name: Install Virtualbox
+  include_tasks:
+    file: virtualbox.yml
+    apply:
+      tags:
+        - virtualbox
+  tags:
+    - dev
+    - virtualbox

@@ -1,0 +1,25 @@
+---
+- name: Add Backports to sources.list
+  ansible.builtin.shell: >
+    echo "deb http://deb.debian.org/debian $(lsb_release -cs)-backports main contrib" | tee /etc/apt/sources.list.d/backports.list
+  become: yes
+
+- name: Import fasttrack archive keyring
+  become: yes
+  ansible.builtin.apt:
+    name: fasttrack-archive-keyring
+    state: present
+
+- name: Adding fasttrack repositories
+  ansible.builtin.shell: >
+    echo "deb http://fasttrack.debian.net/debian-fasttrack/ $(lsb_release -cs)-fasttrack main contrib" | tee /etc/apt/sources.list.d/fasttrack.list
+    echo "deb http://fasttrack.debian.net/debian-fasttrack/ $(lsb_release -cs)-backports-staging main contrib" | tee -a /etc/apt/sources.list.d/fasttrack.list
+  become: yes
+
+- name: Update apt
+  ansible.builtin.apt:
+    pkg:
+      - virtualbox
+      - virtualbox-guest-x11
+    update_cache: yes
+  become: yes
