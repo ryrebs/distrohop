@@ -30,8 +30,7 @@
     state: present
   register: tlp
   become: yes
-  notify:
-    - Setup tlp config
+  notify: Setup tlp
   tags:
     - base
     - tlp
@@ -49,23 +48,6 @@
     - base
     - firewall
 
-- name: Remove useless packages from the cache
-  become: yes
-  ansible.builtin.apt:
-    autoclean: yes
-  tags:
-    - base
-    - cleanup
-
-- name: Remove dependencies that are no longer required and purge their configuration files
-  become: yes
-  ansible.builtin.apt:
-    autoremove: yes
-    purge: true
-  tags:
-    - base
-    - cleanup
-
 - name: Install some packages for development
   become: yes
   ansible.builtin.apt:
@@ -78,18 +60,6 @@
       - vim
   tags:
     - dev
-
-- name: Install zsh
-  ansible.builtin.apt:
-    pkg:
-      - zsh
-      - zplug
-  register: zsh
-  become: yes
-  notify: Change shell to zsh
-  tags:
-    - dev
-    - zsh
 
 - name: Remove existing .oh-my-zsh
   file:
@@ -109,9 +79,36 @@
     - dev
     - zshrc
 
+- name: Setup git configurations
+  command: "git config --global {{ item }}"
+  with_items:
+    - user.name "{{ github_user }}"
+    - user.email "{{ github_email }}"
+    - color.ui auto
+    - color.branch auto
+    - color.diff auto
+    - color.status auto
+  when:
+    - github_user != None
+    - github_email != None
+  tags:
+    - dev
+    - git
+
+- name: Create git log alias
+  blockinfile:
+    path: "{{ ansible_env.HOME }}/.zshrc"
+    state: present
+    marker: "# {mark} ANSIBLE MANAGED BLOCK Git Aliases"
+    block: |
+      'alias glog="git log --graph --all --pretty=format:''%C(blue)%h %C(red)%d %Creset - %C(yellow)%s%Creset %C(green)(%cr)%Creset <%aN>''"'
+  tags:
+    - dev
+    - git
+
 - name: Create nvm folder
   ansible.builtin.file:
-    path: "{{ nvm_path }}"
+    path: "{{ nvm_dir_path }}"
     state: directory
     mode: "0755"
   register: nvm_folder
@@ -121,9 +118,9 @@
 
 - name: Install nvm
   shell: >
-    export NVM_DIR={{ nvm_path }} && curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/{{ nvm_version }}/install.sh | bash
+    export NVM_DIR={{ nvm_dir_path }} && curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/{{ nvm_version }}/install.sh | bash
   args:
-    creates: "{{ nvm_path }}/nvm.sh"
+    creates: "{{ nvm_dir_path }}/nvm.sh"
   register: nvm
   when: nvm_folder is success
   tags:
@@ -131,10 +128,10 @@
     - nvm
 
 - name: Install latest node
-  shell: ". {{ nvm_path }}/nvm.sh && nvm install node"
+  shell: ". {{ nvm_dir_path }}/nvm.sh && nvm install node"
   args:
-    creates: "{{ nvm_path }}/.nvm/versions/node"
-    chdir: "{{ nvm_path }}"
+    creates: "{{ nvm_dir_path }}/.nvm/versions/node"
+    chdir: "{{ nvm_dir_path }}"
     executable: /bin/zsh
   when: nvm is success
   tags:
@@ -148,7 +145,7 @@
     marker: "# {mark} ANSIBLE MANAGED BLOCK Defaults"
     block: |
       # Android
-      ANDROID_HOME={{ android_home_path }}
+      ANDROID_HOME={{ android_home_dir_path }}
       export ANDROID_NDK_HOME=$ANDROID_HOME/ndk
       export PATH=$PATH:$ANDROID_HOME/emulator
       export PATH=$PATH:$ANDROID_HOME/tools
@@ -166,7 +163,7 @@
       alias scanf="clamscan"
 
       # Firejail
-      alias fjail='firejail --apparmor --private={{ jailtime_path }}'
+      alias fjail='firejail --apparmor --private={{ jailtime_dir_path }}'
 
       alias ec="vim $HOME/.zshrc" # edit .zshrc
       alias sc="source $HOME/.zshrc"  # reload zsh configuration
@@ -185,3 +182,30 @@
   tags:
     - dev
     - golang
+
+- name: Install zsh
+  ansible.builtin.apt:
+    pkg:
+      - zsh
+      - zplug
+  register: zsh
+  become: yes
+  notify: Change shell to zsh
+  tags:
+    - dev
+    - zsh
+
+- name: Remove useless packages from the cache
+  become: yes
+  ansible.builtin.apt:
+    autoclean: yes
+  tags:
+    - cleanup
+
+- name: Remove dependencies that are no longer required and purge their configuration files
+  become: yes
+  ansible.builtin.apt:
+    autoremove: yes
+    purge: true
+  tags:
+    - cleanup
