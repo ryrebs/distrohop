@@ -90,6 +90,7 @@
   tags:
     - dev
     - git
+    - ssh
 
 - name: Create nvm folder
   ansible.builtin.file:
