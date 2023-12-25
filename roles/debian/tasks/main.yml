@@ -223,3 +223,14 @@
   tags:
     - dev
     - virtualbox
+
+- name: Install Docker
+  include_tasks:
+    file: docker.yml
+    apply:
+      tags:
+        - docker
+  tags:
+    - dev
+    - docker
+
