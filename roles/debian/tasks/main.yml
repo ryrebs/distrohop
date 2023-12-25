@@ -83,7 +83,7 @@
     - git
 
 - name: Generate rsa keys
-  ansible.builtin.command: ssh-keygen -t ed25519 -C '{{ github_email }}' -f "{{ ansible_env.HOME }}/.ssh/id_rsa"
+  ansible.builtin.command: ssh-keygen -t ed25519 -C '{{ github_email }}' -f "{{ ansible_env.HOME }}/.ssh/id_rsa" -N ""
   args:
     creates: "{{ ansible_env.HOME }}/.ssh/id_rsa"
   when: github_email is defined
@@ -219,6 +219,7 @@
     file: virtualbox.yml
     apply:
       tags:
+        - dev
         - virtualbox
   tags:
     - dev
@@ -229,6 +230,7 @@
     file: docker.yml
     apply:
       tags:
+        - dev
         - docker
   tags:
     - dev
