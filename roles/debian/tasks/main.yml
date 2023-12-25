@@ -10,19 +10,29 @@
   tags:
     - base
 
-- name: Install base packages (Packages without further setup needs.)
+- name: Install base packages
   become: yes
   ansible.builtin.apt:
     pkg:
       - firejail
-      - clamav
       - gammastep
       - firefox-esr
-      - default-jdk
       - apparmor-profiles-extra
       - apparmor-profiles
+      - sshpass
   tags:
     - base
+
+- name: Load/unload kernel modules
+  become: yes
+  copy:
+    dest: "{{ kernel_module_conf_file_path }}"
+    content: |
+      blacklist pcspkr
+      blacklist snd_pcsp
+  tags:
+    - base
+    - kernel-mod
 
 - name: Install tlp for battery management
   ansible.builtin.apt:
@@ -50,11 +60,15 @@
   become: yes
   ansible.builtin.apt:
     pkg:
+      - default-jdk
       - terminator
       - git
       - chromium
       - default-jdk
       - vim
+      - clamav
+      - clamav-daemon
+      - htop
   tags:
     - dev
 
@@ -157,6 +171,18 @@
     - dev
     - zshrc
 
+- name: Insert MISC shell lines for base
+  blockinfile:
+    path: "{{ ansible_env.HOME }}/.bashrc"
+    state: present
+    marker: "# {mark} ANSIBLE MANAGED BLOCK Defaults"
+    block: |
+      # Firejail
+      alias fjail='firejail --apparmor --private={{ jailtime_dir_path }}'
+    tags:
+      - base
+      - bashrc
+
 - name: Insert MISC shell lines
   blockinfile:
     path: "{{ ansible_env.HOME }}/.zshrc"
@@ -178,7 +204,7 @@
       alias getsize="du -h ./ | grep -P '\dG'"
 
       # Clamav
-      alias scanhome="clamscan --recursive --infected {{ ansible_env.HOME }}"
+      alias scanhome="clamscan --max-filesize=2000M --max-scansize=2000M --recursive --infected $HOME"
       alias scanf="clamscan"
 
       # Firejail
@@ -236,4 +262,3 @@
   tags:
     - dev
     - docker
-
