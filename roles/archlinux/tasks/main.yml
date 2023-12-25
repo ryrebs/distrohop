@@ -210,7 +210,7 @@
 - name: Load/unload kernel modules
   become: yes
   copy:
-    dest: "{{ arch_kernel_module_conf_file_path }}"
+    dest: "{{ kernel_module_conf_file_path }}"
     content: |
       blacklist pcspkr
       blacklist snd_pcsp
