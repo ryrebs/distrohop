@@ -67,7 +67,7 @@
     - zshrc
 
 - name: Setup git configurations
-  command: "git config --global {{ item }}"
+  ansible.builtin.command: "git config --global {{ item }}"
   with_items:
     - user.name "{{ github_user }}"
     - user.email "{{ github_email }}"
@@ -76,8 +76,17 @@
     - color.diff auto
     - color.status auto
   when:
-    - github_user != None
-    - github_email != None
+    - github_user is defined
+    - github_email is defined
+  tags:
+    - dev
+    - git
+
+- name: Generate rsa keys
+  ansible.builtin.command: ssh-keygen -t ed25519 -C '{{ github_email }}' -f "{{ ansible_env.HOME }}/.ssh/id_rsa"
+  args:
+    creates: "{{ ansible_env.HOME }}/.ssh/id_rsa"
+  when: github_email is defined
   tags:
     - dev
     - git
