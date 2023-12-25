@@ -16,10 +16,17 @@
     echo "deb http://fasttrack.debian.net/debian-fasttrack/ $(lsb_release -cs)-backports-staging main contrib" | tee -a /etc/apt/sources.list.d/fasttrack.list
   become: yes
 
-- name: Update apt
+- name: Install virtualbox package
+  ansible.builtin.apt:
+    name: virtualbox
+    state: present
+    update_cache: yes
+  become: yes
+
+- name: Install guest additions
   ansible.builtin.apt:
     pkg:
-      - virtualbox
       - virtualbox-guest-x11
     update_cache: yes
   become: yes
+  when: remote | default(false)
