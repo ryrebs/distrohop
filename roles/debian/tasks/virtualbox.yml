@@ -12,7 +12,7 @@
 
 - name: Adding fasttrack repositories
   ansible.builtin.shell: >
-    echo "deb http://fasttrack.debian.net/debian-fasttrack/ $(lsb_release -cs)-fasttrack main contrib" | tee /etc/apt/sources.list.d/fasttrack.list
+    echo "deb http://fasttrack.debian.net/debian-fasttrack/ $(lsb_release -cs)-fasttrack main contrib" | tee /etc/apt/sources.list.d/fasttrack.list;
     echo "deb http://fasttrack.debian.net/debian-fasttrack/ $(lsb_release -cs)-backports-staging main contrib" | tee -a /etc/apt/sources.list.d/fasttrack.list
   become: yes
 
