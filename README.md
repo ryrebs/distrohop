@@ -27,7 +27,17 @@ Getting started:
 
 3. Run the playbook:
 
-    `pipenv run runplaybook [ansible-options]`
+    ```
+    pipenv run runplaybook playbook.yml  \
+        --tags base,dev,cleanup \
+        -i inventory.yml \ (if remote node)
+        -v \
+        --flush-cache \
+        --extra-vars="[vars..]" \
+        --skip-tags [tags] \
+        -K \
+        --ask-pass
+    ```
 
 Tags: base, dev
 
