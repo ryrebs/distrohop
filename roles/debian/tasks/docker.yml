@@ -1,1 +1,50 @@
 ---
+- name: Add Docker's official GPG key p1
+  become: yes
+  ansible.builtin.apt:
+    pkg:
+      - ca-certificates
+      - gnupg
+      - curl
+  register: p1
+
+- name: Add Docker's official GPG key p2
+  become: yes
+  ansible.builtin.command: install -m 0755 -d /etc/apt/keyrings
+  when: p1 is succeeded
+  register: p2
+
+- name: Add Docker's official GPG key p3
+  become: yes
+  ansible.builtin.shell: >
+    curl -fsSL https://download.docker.com/linux/debian/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+  args:
+    creates: /etc/apt/keyrings/docker.gpg
+  when: p2 is succeeded
+  register: p3
+
+- name: Add Docker's official GPG key p4
+  become: yes
+  ansible.builtin.command: chmod a+r /etc/apt/keyrings/docker.gpg
+  when: p3 is succeeded
+  register: p4
+
+- name: Add the repository to Apt sources
+  become: yes
+  ansible.builtin.shell: >
+    echo \
+    "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
+  register: docker_repo
+  when: p4 is succeeded
+
+- name: Install docker related packages
+  become: yes
+  ansible.builtin.apt:
+    pkg:
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+      - docker-buildx-plugin
+      - docker-compose-plugin
+    update_cache: yes
+  when: docker_repo is succeeded
