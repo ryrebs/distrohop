@@ -58,7 +58,7 @@
     state: present
     marker: "# {mark} ANSIBLE MANAGED BLOCK Git Aliases"
     block: |
-      'alias glog="git log --graph --all --pretty=format:''%C(blue)%h %C(red)%d %Creset - %C(yellow)%s%Creset %C(green)(%cr)%Creset <%aN>''"'
+      alias glog="git log --graph --all --pretty=format:''%C(blue)%h %C(red)%d %Creset - %C(yellow)%s%Creset %C(green)(%cr)%Creset <%aN>''"
   tags:
     - dev
     - git
