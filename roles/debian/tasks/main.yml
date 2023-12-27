@@ -14,12 +14,13 @@
   become: yes
   ansible.builtin.apt:
     pkg:
+      - apparmor-profiles
+      - apparmor-profiles-extra
       - firejail
       - gammastep
       - firefox-esr
-      - apparmor-profiles-extra
-      - apparmor-profiles
       - sshpass
+      - blueman
   tags:
     - base
 
