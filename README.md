@@ -9,11 +9,11 @@ _Supported Distros_:
     <img src="images/debian-icon.png" width="30" height="30"/>
 </p>
 
-Dependencies: 
+Dependencies:
 
- - python3.11 
- - pipenv
- - ansible
+- python3.11
+- pipenv
+- ansible
 
 Getting started:
 
@@ -21,25 +21,51 @@ Getting started:
 
 2. Install other dependencies:
 
-    `pipenv install` (On project root)
+   `pipenv install` (On project root)
 
 3. Update `common-vars.yml`
 
-3. Run the playbook:
+4. Run the playbook:
 
-    ```
-    pipenv run runplaybook playbook.yml  \
-        --tags base,dev,cleanup \
-        -i inventory.yml \ (if remote node)
-        -v \
-        --flush-cache \
-        --extra-vars="[vars..]" \
-        --skip-tags [tags] \
-        -K \
-        --ask-pass
-    ```
+   ```
+   pipenv run runplaybook playbook.yml  \
+       -i inventory.yml \ (if remote node)
+       -v \
+       --flush-cache \
+       --extra-vars="[vars..]" \
+       --skip-tags [tags..] \
+       --tags [tags..]
+       --ask-pass \
+       --ask-become
+   ```
 
 Tags: base, dev
+
+Sample for localhost:
+
+```
+pipenv run runplaybook playbook.yml  \
+    -v \
+    --flush-cache \
+    --skip-tags [tags..] \
+    --tags base,virtualbox,cleanup \
+    --ask-pass \
+    --ask-become
+```
+
+Sample for remote managed node:
+
+```
+pipenv run runplaybook playbook.yml  \
+    -i inventory.yml \
+    -v \
+    --flush-cache \
+    --skip-tags [tags..] \
+    --tags base,dev,cleanup \
+    --extra-vars="remote=yes" \
+    --ask-pass \
+    --ask-become
+```
 
 Base packages:
 
@@ -51,7 +77,8 @@ Base packages:
 - redshift / gammastep
 - yay
 - firefox
-- jdk-openjdk 
+- jdk-openjdk
+- blueman
 
 Dev packages:
 
@@ -68,3 +95,4 @@ Dev packages:
 - docker compose
 - codium
 - virtualbox
+- nodejs
