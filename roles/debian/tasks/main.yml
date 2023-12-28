@@ -71,6 +71,7 @@
       - clamav-daemon
       - htop
       - pipenv
+      - xpad
   tags:
     - dev
 

@@ -96,3 +96,4 @@ Dev packages:
 - codium
 - virtualbox
 - nodejs
+- xpad
