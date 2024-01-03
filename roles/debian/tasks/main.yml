@@ -109,37 +109,6 @@
     - git
     - ssh
 
-- name: Create nvm folder
-  ansible.builtin.file:
-    path: "{{ nvm_dir_path }}"
-    state: directory
-    mode: "0755"
-  register: nvm_folder
-  tags:
-    - dev
-    - nvm
-
-- name: Install nvm
-  ansible.builtin.shell: >
-    export PROFILE=/dev/null NVM_DIR={{ nvm_dir_path }} && curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/{{ nvm_version }}/install.sh | bash
-  args:
-    creates: "{{ nvm_dir_path }}/nvm.sh"
-  register: nvm
-  when: nvm_folder is success
-  tags:
-    - dev
-    - nvm
-
-- name: Install latest node
-  ansible.builtin.command: "/bin/sh {{ nvm_dir_path }}/nvm.sh && nvm install node"
-  args:
-    creates: "{{ nvm_dir_path }}/.nvm/versions/node"
-    chdir: "{{ nvm_dir_path }}"
-  when: nvm is success
-  tags:
-    - dev
-    - node
-
 - name: Install Golang
   get_url:
     url: "https://dl.google.com/go/{{ golang_version }}.linux-amd64.tar.gz"
@@ -265,3 +234,10 @@
   tags:
     - dev
     - docker
+
+- block:
+    - name: Install latest node
+      include_tasks: node.yml
+  tags:
+    - dev
+    - node

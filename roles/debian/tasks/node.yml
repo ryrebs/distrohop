@@ -1,0 +1,33 @@
+---
+- name: Create nvm folder
+  ansible.builtin.file:
+    path: "{{ nvm_dir_path }}"
+    state: directory
+    mode: "0755"
+  register: nvm_folder
+
+- name: Install nvm
+  ansible.builtin.shell: >
+    export PROFILE=/dev/null NVM_DIR={{ nvm_dir_path }} && curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/{{ nvm_version }}/install.sh | bash
+  args:
+    creates: "{{ nvm_dir_path }}/nvm.sh"
+  register: nvm
+  when: nvm_folder is success
+
+- name: Add nvm to PATH
+  blockinfile:
+    path: "{{ ansible_env.HOME }}/.zshrc"
+    state: present
+    marker: "# {mark} ANSIBLE MANAGED BLOCK NVM|NODE"
+    block: |
+      export NVM_DIR="{{ nvm_dir_path }}"
+      [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
+  register: nvm
+  when: nvm is success
+
+- name: Install latest NodeJS
+  ansible.builtin.shell: \. "{{ nvm_dir_path }}/nvm.sh" && nvm install --lts
+  args:
+    creates: "{{ nvm_dir_path }}/.nvm/versions/node"
+    chdir: "{{ nvm_dir_path }}"
+  when: nvm is success
