@@ -1,0 +1,24 @@
+---
+- name: Install Clamav
+  become: yes
+  ansible.builtin.apt:
+    pkg:
+      - clamav
+      - clamav-daemon
+  register: clamav
+
+- name: Enable Clamav daemon
+  ansible.builtin.systemd_service:
+    state: started
+    name: clamav-daemon
+    enabled: true
+  become: yes
+  when: clamav is success
+
+- name: Enable Clamav freshclam service
+  ansible.builtin.systemd_service:
+    state: started
+    name: clamav-freshclam
+    enabled: true
+  become: yes
+  when: clamav is success

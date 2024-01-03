@@ -67,8 +67,6 @@
       - chromium
       - default-jdk
       - vim
-      - clamav
-      - clamav-daemon
       - htop
       - pipenv
       - xpad
@@ -241,3 +239,10 @@
   tags:
     - dev
     - node
+
+- block:
+    - name: Install Clamav
+      include_tasks: clamav.yml
+  tags:
+    - dev
+    - clamav
