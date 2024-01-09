@@ -97,3 +97,4 @@ Dev packages:
 - virtualbox
 - nodejs
 - xpad
+- eog
