@@ -7,31 +7,31 @@
       ## -- Start custom config
       ## Mostly firmware related. Check docs for more info
 
-      ## On battery related settings
       # Start charging at level below this threshold
       START_CHARGE_THRESH_BAT0=26
 
       # Stop charging at threshold level or greater
       STOP_CHARGE_THRESH_BAT0=81
 
-      # Enable platform profile
-      PLATFORM_PROFILE_ON_BAT=balance_power
-
-      # Disable turbo boost
-      CPU_BOOST_ON_BAT=0
-
-      ## On ac related settings
       # Set CPU energy/performance policies
-      CPU_ENERGY_PERF_POLICY_ON_AC=balance_performance
+      CPU_ENERGY_PERF_POLICY_ON_AC=performance
+      CPU_ENERGY_PERF_POLICY_ON_BAT="balance_power"
 
       # Enable platform profile
-      PLATFORM_PROFILE_ON_AC=balance_performance
+      PLATFORM_PROFILE_ON_AC=performance
+      PLATFORM_PROFILE_ON_BAT=balance_power
 
       # Controls runtime power management for PCIe devices
       RUNTIME_PM_ON_AC=auto
+      RUNTIME_PM_ON_BAT=auto
 
-      # Enable turbo boost
+      # Turbo boost
       CPU_BOOST_ON_AC=1
+      CPU_BOOST_ON_BAT=0
+
+      # Wifi powersaving
+      WIFI_PWR_ON_AC="off"
+      WIFI_PWR_ON_BAT="on"
 
       ## -- End custom config
   when: tlp is succeeded
