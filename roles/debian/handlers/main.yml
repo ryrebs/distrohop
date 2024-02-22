@@ -29,7 +29,7 @@
       CPU_BOOST_ON_AC=1
       CPU_BOOST_ON_BAT=0
 
-      # Wifi powersaving
+      # Wifi powersaving (Slows down wifi)
       WIFI_PWR_ON_AC="off"
       WIFI_PWR_ON_BAT="on"
 
