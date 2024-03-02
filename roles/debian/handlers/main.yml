@@ -46,7 +46,7 @@
 - name: Change shell to zsh
   become: yes
   user:
-    name: "{{ remote_user }}"
+    name: "{{ shell_user }}"
     shell: /usr/bin/zsh
     state: present
   when: zsh_install is succeeded

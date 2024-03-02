@@ -26,7 +26,8 @@
   when: nvm is success
 
 - name: Install latest NodeJS
-  ansible.builtin.shell: \. "{{ nvm_dir_path }}/nvm.sh" && nvm install --lts
+  ansible.builtin.shell: >
+    . "{{ nvm_dir_path }}"/nvm.sh && nvm install --lts
   args:
     creates: "{{ nvm_dir_path }}/.nvm/versions/node"
     chdir: "{{ nvm_dir_path }}"
