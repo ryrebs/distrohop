@@ -28,7 +28,7 @@ Getting started:
 4. Run the playbook:
 
    ```
-   pipenv run runplaybook playbook.yml  \
+   pipenv run runplaybook \
        -i inventory.yml \ (if remote node)
        -v \
        --flush-cache \
@@ -44,7 +44,7 @@ Tags: base, dev
 Sample for localhost:
 
 ```
-pipenv run runplaybook playbook.yml  \
+pipenv run runplaybook \
     -v \
     --flush-cache \
     --skip-tags [tags..] \
@@ -56,7 +56,7 @@ pipenv run runplaybook playbook.yml  \
 Sample for remote managed node:
 
 ```
-pipenv run runplaybook playbook.yml  \
+pipenv run runplaybook \
     -i inventory.yml \
     -v \
     --flush-cache \
