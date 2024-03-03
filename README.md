@@ -49,7 +49,6 @@ pipenv run runplaybook \
     --flush-cache \
     --skip-tags [tags..] \
     --tags base,virtualbox,cleanup \
-    --ask-pass \
     --ask-become
 ```
 
