@@ -183,6 +183,9 @@
 
       alias ec="vim $HOME/.zshrc" # edit .zshrc
       alias sc="source $HOME/.zshrc"  # reload zsh configuration
+
+      # Hibernate command (Hibernating through closing the lid is buggy in debian 12.5),
+      # so manually issue the command until it's fixed.
   tags:
     - dev
     - zshrc
