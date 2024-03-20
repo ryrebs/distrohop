@@ -150,6 +150,10 @@
     block: |
       # Firejail
       alias fjail='firejail --apparmor --private={{ jailtime_dir_path }}'
+
+      # Clamav
+      alias scanhome="clamscan --max-filesize=2000M --max-scansize=2000M --recursive --infected $HOME"
+      alias scanf="clamscan"
     tags:
       - base
       - bashrc
