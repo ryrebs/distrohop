@@ -50,6 +50,9 @@
     shell: /usr/bin/zsh
     state: present
   when: zsh_install is succeeded
+  tags:
+    - dev
+    - chsh
 
 - name: Create git log alias
   listen: Setup zshrc
