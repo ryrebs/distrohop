@@ -165,9 +165,10 @@
     marker: "# {mark} ANSIBLE MANAGED BLOCK Defaults"
     block: |
       # Android
-      export ANDROID_SDK_ROOT={{ android_sdk_root_path }}
-      export PATH=$PATH:$ANDROID_SDK_ROOT/platform-tools
-      export PATH=$PATH:$ANDROID_SDK_ROOT/emulator
+      export ANDROID_HOME={{ android_home_path }}
+      export ANDROID_NDK=$ANDROID_HOME/ndk/<replace-with-version>
+      export PATH=$PATH:$ANDROID_HOME/platform-tools
+      export PATH=$PATH:$ANDROID_HOME/emulator
 
       # Pipenv
       export PIPENV_VENV_IN_PROJECT="enabled"
