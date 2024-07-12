@@ -108,18 +108,6 @@
     - git
     - ssh
 
-- name: Install Golang
-  get_url:
-    url: "https://dl.google.com/go/{{ golang_version }}.linux-amd64.tar.gz"
-    dest: "{{ ansible_env.HOME }}/Downloads/golang.tar.gz"
-  notify:
-    - Golang post installation setup
-    - Export golang paths
-  register: golang
-  tags:
-    - dev
-    - golang
-
 - name: Install zsh
   become: yes
   ansible.builtin.apt:
@@ -252,3 +240,10 @@
   tags:
     - dev
     - clamav
+
+- block:
+    - name: Install Golang
+      include_tasks: golang.yml
+  tags:
+    - dev
+    - golang

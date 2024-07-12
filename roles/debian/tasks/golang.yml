@@ -1,0 +1,46 @@
+---
+- name: Install Golang
+  get_url:
+    url: "https://dl.google.com/go/{{ golang_version }}.linux-amd64.tar.gz"
+    dest: "{{ ansible_env.HOME }}/Downloads/golang.tar.gz"
+  register: golang
+
+- name: Create golang root extraction folder
+  ansible.builtin.file:
+    path: "{{ golang_root_dir_path }}"
+    state: directory
+    mode: "0755"
+  when: golang is succeeded
+
+- name: Create golang package folder
+  ansible.builtin.file:
+    path: "{{ golang_app_dir_path }}"
+    state: directory
+    mode: "0755"
+  when: golang is succeeded
+
+- name: Extract golang
+  unarchive:
+    src: "{{ ansible_env.HOME }}/Downloads/golang.tar.gz"
+    dest: "{{ golang_root_dir_path }}"
+    remote_src: "{{ remote | default(false) }}"
+  when: golang is succeeded
+
+- name: Remove golang tgz
+  file:
+    path: "{{ ansible_env.HOME }}/Downloads/golang.tar.gz"
+    state: absent
+
+- name: Export golang paths
+  blockinfile:
+    path: "{{ ansible_env.HOME }}/.zshrc"
+    state: present
+    marker: "# {mark} ANSIBLE MANAGED BLOCK Golang"
+    block: |
+      # Golang
+      export GOPATH={{ golang_app_dir_path }}
+      export GOBIN={{ golang_app_dir_path }}/bin
+      export PATH=$PATH:$GOBIN
+      export PATH=$PATH:$GOPATH
+      export PATH=$PATH:{{ golang_root_dir_path }}/go/bin
+  when: golang is succeeded
