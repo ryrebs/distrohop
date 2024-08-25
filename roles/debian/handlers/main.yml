@@ -130,10 +130,10 @@
     chdir: "{{ ansible_env.HOME }}/Downloads"
   become: yes
   when: codium is succeeded
-  listen: Codium post install
+  listen: Codium post download
 
 - name: Remove codium .deb
   file:
     path: "{{ ansible_env.HOME }}/Downloads/codium_{{ codium_version }}_amd64.deb"
     state: absent
-  listen: Codium post install
+  listen: Codium post download
