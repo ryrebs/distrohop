@@ -195,11 +195,11 @@
   tags:
     - cleanup
 
-- name: Install VScodium
+- name: Download VScodium
   ansible.builtin.get_url:
     url: "https://github.com/VSCodium/vscodium/releases/download/{{ codium_version }}/codium_{{ codium_version }}_amd64.deb"
     dest: "{{ ansible_env.HOME }}/Downloads"
-  notify: Codium post install
+  notify: Codium post download
   register: codium
   tags:
     - dev
