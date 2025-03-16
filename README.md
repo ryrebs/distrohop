@@ -97,3 +97,4 @@ Dev packages:
 - nodejs
 - xpad
 - eog
+- brave

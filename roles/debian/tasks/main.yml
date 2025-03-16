@@ -247,3 +247,10 @@
   tags:
     - dev
     - golang
+
+- block:
+    - name: Install Brave
+      include_tasks: brave.yml
+  tags:
+    - dev
+    - brave

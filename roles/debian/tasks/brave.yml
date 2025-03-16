@@ -1,0 +1,23 @@
+---
+- name: Add Braves's keyring
+  ansible.builtin.shell: >
+    curl -fsSLo /usr/share/keyrings/brave-browser-archive-keyring.gpg https://brave-browser-apt-release.s3.brave.com/brave-browser-archive-keyring.gpg
+  args:
+    creates: /usr/share/keyrings/brave-browser-archive-keyring.gpg
+  register: download_keyring
+  become: yes
+
+- name: Add Brave's source ot sources.list.d
+  ansible.builtin.shell: >
+    echo "deb [signed-by=/usr/share/keyrings/brave-browser-archive-keyring.gpg] https://brave-browser-apt-release.s3.brave.com/ stable main"|tee /etc/apt/sources.list.d/brave-browser-release.list
+  args:
+    creates: /etc/apt/sources.list.d/brave-browser-release.list
+  become: yes
+  when: download_keyring is success
+
+- name: Install virtualbox package
+  ansible.builtin.apt:
+    name: brave-browser
+    state: present
+    update_cache: yes
+  become: yes
