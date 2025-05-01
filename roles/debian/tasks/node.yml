@@ -32,3 +32,4 @@
     creates: "{{ nvm_dir_path }}/.nvm/versions/node"
     chdir: "{{ nvm_dir_path }}"
   when: nvm is success
+  become: yes
