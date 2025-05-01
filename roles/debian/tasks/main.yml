@@ -76,7 +76,7 @@
 
 - name: Remove existing .oh-my-zsh
   file:
-    path: "{{ ansible_env.HOME }}/.oh-my-zsh"
+    path: "{{ ohmyzsh_dir_path }}/.oh-my-zsh"
     state: absent
   tags:
     - dev
@@ -123,7 +123,7 @@
 - name: Install oh-my-zsh
   ansible.builtin.shell: curl -o- "https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh" | bash
   args:
-    chdir: "{{ ansible_env.HOME }}"
+    chdir: "{{ ohmyzsh_dir_path }}"
   notify: Setup zshrc
   when: zsh_install is succeeded
   tags:
