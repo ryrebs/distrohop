@@ -10,6 +10,7 @@ arch_zplug_dir_path: <abs-path-to-folder>
 golang_root_dir_path: <abs-path-to-folder>/golang
 golang_app_dir_path: <abs-path-to-folder>/golang/packages
 jailtime_dir_path: <abs-path-to-folder>/jailtime
+ohmyzsh_dir_path: <abs-path-to-folder>/<.oh-my-zsh>
 tlp_conf_file_path: <abs-path-to-folder-tlp.d>/<x>-<yourcustomconfig>.conf
 kernel_module_conf_file_path: <abs-path-to-folder-modprobe.d>/<yourcustomconfig>.conf
 codium_version: <x.x.x>
