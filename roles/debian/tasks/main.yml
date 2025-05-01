@@ -153,7 +153,7 @@
     marker: "# {mark} ANSIBLE MANAGED BLOCK Defaults"
     block: |
       # Android
-      export ANDROID_HOME={{ android_home_path }}
+      export ANDROID_HOME={{ android_home_dir_path }}
       export ANDROID_NDK=$ANDROID_HOME/ndk/<replace-with-version>
       export PATH=$PATH:$ANDROID_HOME/platform-tools
       export PATH=$PATH:$ANDROID_HOME/emulator
