@@ -21,6 +21,16 @@
       - firefox-esr
       - sshpass
       - blueman
+      - pipewire
+      - libspa-0.2-bluetooth
+  tags:
+    - base
+
+- name: Remove installed packages
+  become: yes
+  ansible.builtin.apt:
+    name: pulseaudio-module-bluetooth # Replaced with pipewire
+    state: absent
   tags:
     - base
 
