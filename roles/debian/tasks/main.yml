@@ -142,9 +142,9 @@
       # Clamav
       alias scanhome="clamscan --max-filesize=2000M --max-scansize=2000M --recursive --infected $HOME"
       alias scanf="clamscan"
-    tags:
-      - base
-      - bashrc
+  tags:
+    - base
+    - bashrc
 
 - name: Insert MISC shell lines for dev setup
   blockinfile:
