@@ -5,7 +5,7 @@ github_email: <user@x.x>
 golang_version: <gox.x.x>
 nvm_version: <x.x.x>
 nvm_dir_path: <abs-path-to-folder>/.nvm
-android_home_path: <abs-path-to-folder>/Sdk
+android_home_dir_path: <abs-path-to-folder>/Sdk
 arch_zplug_dir_path: <abs-path-to-folder>
 golang_root_dir_path: <abs-path-to-folder>/golang
 golang_app_dir_path: <abs-path-to-folder>/golang/packages
